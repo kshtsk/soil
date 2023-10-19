@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"soil/util"
 	"strconv"
 	"strings"
@@ -28,6 +29,56 @@ type ScalabilityDeployment struct {
 	TerraformVarFile string `json:"terraform_var_file"`
 	RancherReplicas  int    `json:"rancher_replicas"`
 	Kind             string `json:"kind"`
+}
+
+func (d ScalabilityDeployment) saveStatus() {
+	log.Printf("Saving status for: %s", reflect.TypeOf(d))
+	saveStatus(&d)
+}
+
+func (d ScalabilityDeployment) CheckRequirements() (result bool) {
+	/*
+		ScalabilityTests needs:
+		- terraform
+		- kubectl
+		- helm
+		- git
+	*/
+	result = true
+	gitVersion, err := util.ShellQuietOutput("git --version")
+	if err != nil {
+		log.Printf("Error: no git found, please install git")
+		result = false
+	} else {
+		log.Printf("Found git version: %s", util.SplitLast(strings.TrimSpace(gitVersion), " "))
+	}
+	kubectlVersion, err := util.ShellQuietUnmarshalJson("kubectl version --client=true -o=json 2>/dev/null")
+	if err != nil {
+		log.Printf("Error: no kubectl found, please install kubectl")
+		result = false
+	} else {
+		ver, _ := kubectlVersion["kustomizeVersion"]
+		log.Printf("Found kubectl version: %s", ver)
+	}
+
+	terraformVersion, err := util.ShellQuietUnmarshalJson("terraform version -json")
+	if err != nil {
+		log.Printf("Error: no terraform found, please install terraform from " +
+			"https://releases.hashicorp.com/terraform/")
+		result = false
+	} else {
+		ver, _ := terraformVersion["terraform_version"]
+		log.Printf("Found terraform version: %s", ver)
+
+	}
+	helmVersion, err := util.ShellQuietOutput("helm version --template='{{.Version}}'")
+	if err != nil {
+		log.Printf("Error: no helm found")
+		result = false
+	} else {
+		log.Printf("Found helm version: %s", helmVersion)
+	}
+	return result
 }
 
 func (d ScalabilityDeployment) Brief() string {
@@ -78,6 +129,11 @@ func (d ScalabilityDeployment) getRepo() {
 	util.CloneGitRepo(d.Repo, d.getRepoLocalPath())
 }
 
+/**
+ * Make: create workdir, get repo, and build environment
+ *
+ * Returns deployment workdir path.
+ */
 func (d ScalabilityDeployment) Make() (path string) {
 	path = d.makeWorkdir(&d)
 	//saveStatus(&d)

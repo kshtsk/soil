@@ -193,6 +193,25 @@ func Shell(cmd string) (string, error) {
 	return run.execLogging("bash", "-c", cmd)
 }
 
+func ShellUnmarshalJson(cmd string) (map[string]any, error) {
+	log.Printf("Running command: %s", cmd)
+	run := NewRun()
+	output, err := run.execLogging("bash", "-c", cmd)
+	var result map[string]any
+	json.Unmarshal([]byte(output), &result)
+	return result, err
+}
+
+func ShellQuietUnmarshalJson(cmd string) (map[string]any, error) {
+	run := NewRun()
+	run.Logging.Stderr = false
+	run.Logging.Stdout = false
+	output, err := run.execLogging("bash", "-c", cmd)
+	var result map[string]any
+	json.Unmarshal([]byte(output), &result)
+	return result, err
+}
+
 func ShellCombined(cmd string) (string, error) {
 	run := NewRun()
 	run.Capture.Stderr = true
@@ -204,6 +223,13 @@ func ShellOutput(cmd string) (string, error) {
 	run := NewRun()
 	return run.execLogging("bash", "-c", cmd)
 }
+
+func ShellQuietOutput(cmd string) (string, error) {
+	run := NewRun()
+	run.Logging.Stdout = false
+	return run.execLogging("bash", "-c", cmd)
+}
+
 func HelmJson(values map[string]any) string {
 	var keyvalues []string
 	for k, v := range values {
