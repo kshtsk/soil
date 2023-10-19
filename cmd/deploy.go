@@ -32,6 +32,8 @@ var deployCmd = &cobra.Command{
 		}
 		k.TerraformRepoRef = deploy.TerraformRepoRef
 		d := deploy.MakeDeployment(name, k)
-		fmt.Printf("Created %s\n", d.Make())
+		if d.CheckRequirements() {
+			fmt.Printf("Created %s\n", d.Make())
+		}
 	},
 }

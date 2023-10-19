@@ -20,6 +20,7 @@ type Deployment interface {
 	DName() string
 	Brief() string
 	StatusFile() string
+	CheckRequirements() bool
 	Extra() map[string]interface{}
 }
 
@@ -92,10 +93,6 @@ func storeStatus(s Status) {
 	defer f.Close()
 }
 
-func (d ScalabilityDeployment) saveStatus() {
-	log.Printf("Saving status for: %s", reflect.TypeOf(d))
-	saveStatus(&d)
-}
 func (d CommonDeployment) Test() {
 	log.Panicf("Test is not implemented for deployment: %s", reflect.TypeOf(d).Elem())
 }
