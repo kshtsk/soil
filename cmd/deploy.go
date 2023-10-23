@@ -13,7 +13,7 @@ func init() {
 
 var deployCmd = &cobra.Command{
 	Use:     "deploy [NAME]",
-	Aliases: []string{"dp"},
+	Aliases: []string{"dp", "make", "mk"},
 	Short:   "Create deployment under given name",
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

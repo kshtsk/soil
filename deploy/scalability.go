@@ -78,6 +78,17 @@ func (d ScalabilityDeployment) CheckRequirements() (result bool) {
 	} else {
 		log.Printf("Found helm version: %s", helmVersion)
 	}
+	if d.Kind == "aws" {
+		awsVersion, err := util.ShellQuietOutput("aws --version")
+		if err != nil {
+			log.Printf("Error: no aws cli found, please install aws, for details refer: " +
+				"https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html")
+			result = false
+		} else {
+			ver := strings.Split(strings.TrimSpace(awsVersion), " ")[0]
+			log.Printf("Found aws cli version: %s", ver)
+		}
+	}
 	return result
 }
 
@@ -225,7 +236,10 @@ func (d ScalabilityDeployment) Run() {
 	if varFilePath != "" {
 		applyCmd = append(applyCmd, "-var-file="+varFilePath)
 	}
-	util.Exec(applyCmd...)
+	_, err := util.Exec(applyCmd...)
+	if err != nil {
+		log.Panicf("%v", err)
+	}
 	status, _ := util.ExecUnmarshalJson("terraform",
 		"-chdir="+d.getTerraformWorkDir(),
 		"output", "-json",
@@ -538,7 +552,7 @@ func HelmInstall(name string, chart string, cluster map[string]any, namespace st
 }
 
 func textNodeAccessCommands(cluster map[string]any) string {
-	nodeAccessCommands := cluster["node_access_commands"].([]any)
+	nodeAccessCommands := cluster["node_access_commands"].(map[string]any)
 	text := ""
 	for node, command := range nodeAccessCommands {
 		text += fmt.Sprintf("    Node %s: %s\n", node, command)
