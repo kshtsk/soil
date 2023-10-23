@@ -71,3 +71,8 @@ Link to home bin:
 (cd $HOME/bin ; ln -s $PWD/so so)
 ```
 
+AWS
+---
+For AWS there is aws cli 2 needed. Go to Amazon and install the client,
+Save credentials to ~/.aws/credential or export as variables:
+AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN.

@@ -73,7 +73,11 @@ func (d ScalabilityDeployment) CheckRequirements() (result bool) {
 	}
 	helmVersion, err := util.ShellQuietOutput("helm version --template='{{.Version}}'")
 	if err != nil {
-		log.Printf("Error: no helm found")
+		log.Printf("Error: no helm found, try:\n" +
+			"    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash\n" +
+			"or:\n" +
+			"    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | " +
+			"HELM_INSTALL_DIR=$HOME/bin USE_SUDO=false bash")
 		result = false
 	} else {
 		log.Printf("Found helm version: %s", helmVersion)
