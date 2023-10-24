@@ -20,6 +20,7 @@ var ADMIN_PASSWORD string = "adminadminadmin"
 var TerraformWorkDir string
 var TerraformVarFile string
 var TerraformRepoRef string
+var SshIdentityFile string
 
 type ScalabilityDeployment struct {
 	CommonDeployment

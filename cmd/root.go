@@ -33,6 +33,7 @@ func init() {
 		"https://github.com/moio/scalability-tests", "Terraform git repo ref")
 	deployCmd.Flags().StringVarP(&deploy.TerraformWorkDir, "terraform-work-dir", "w", "", "Terraform work dir")
 	deployCmd.Flags().StringVarP(&deploy.TerraformVarFile, "terraform-var-file", "v", "", "Terraform var file")
+	deployCmd.Flags().StringVarP(&deploy.SshIdentityFile, "ssh-identity-file", "i", "", "SSH identity file")
 }
 
 func Execute() {
